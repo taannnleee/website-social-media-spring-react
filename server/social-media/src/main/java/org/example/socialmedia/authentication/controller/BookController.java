@@ -1,11 +1,10 @@
-package org.example.socialmedia.Controller;
+package org.example.socialmedia.authentication.controller;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@SpringBootApplication
 @RestController
 @RequestMapping("/api")
 public class BookController {
@@ -16,5 +15,4 @@ public class BookController {
         // Ở đây, chúng ta chỉ trả về một chuỗi làm ví dụ
         return "Danh sách tất cả các sách";
     }
-
 }
