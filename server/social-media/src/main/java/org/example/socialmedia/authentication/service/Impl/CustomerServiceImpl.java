@@ -1,6 +1,6 @@
 package org.example.socialmedia.authentication.service.Impl;
 
-import org.example.socialmedia.authentication.entities.Customer;
+import org.example.socialmedia.common.entities.Customer;
 import org.example.socialmedia.authentication.repositories.CustomerRepository;
 import org.example.socialmedia.authentication.service.CustomerService;
 import org.slf4j.Logger;

@@ -4,7 +4,7 @@ package org.example.socialmedia.authentication.dto;
 
 import lombok.*;
 import org.example.socialmedia.common.Enum.ERole;
-import org.example.socialmedia.authentication.entities.Address;
+import org.example.socialmedia.common.entities.Address;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
