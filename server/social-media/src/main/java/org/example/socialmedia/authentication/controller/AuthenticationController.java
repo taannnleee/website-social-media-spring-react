@@ -22,10 +22,10 @@ import static org.example.socialmedia.common.Enum.EMessage.*;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class AuthenticationController {
-//    private static final Logger log = LogManager.getLogger(AuthenticationController.class);
-//    private final CustomerService customerService;
-//    private final EmailService emailService;
-//    private final AccountService accountService;
+    private static final Logger log = LogManager.getLogger(AuthenticationController.class);
+    private final CustomerService customerService;
+    private final EmailService emailService;
+    private final AccountService accountService;
 
     @PostMapping("/register")
     public ResponseEntity<?> checkRegister(@RequestBody CustomerDTO customerDTO,
@@ -33,19 +33,13 @@ public class AuthenticationController {
                                            @RequestParam("district") String district,
                                            @RequestParam("street") String street) {
         try {
-
             // Trả về một đối tượng JSON chứa kết quả của quá trình đăng ký
-//            log.info("success");
+            log.info("success");
             return ResponseEntity.ok().body("Registration successful!");
         } catch (Exception e) {
             // Xử lý lỗi và trả về một đối tượng JSON chứa thông báo lỗi
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed: " + e.getMessage());
         }
     }
-    @PostMapping("/a")
-    public String temp(@RequestBody CustomerDTO customerDTO){
-        return "user";
-    }
-
 }
 
