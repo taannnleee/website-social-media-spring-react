@@ -1,4 +1,4 @@
-package org.example.socialmedia.authentication.entities;
+package org.example.socialmedia.common.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
