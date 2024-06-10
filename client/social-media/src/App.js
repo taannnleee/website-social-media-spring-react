@@ -1,28 +1,11 @@
-  import logo from './logo.svg'
-  import { useState } from 'react';
-  import './App.css';
+import IndexComponentBinding from "./binding";
+import IndexComponentBindingTwoWay from "./twobinding";
+import IndexComponent from "./useState";
 
-  const orders = [100,200,300];
+function App() {
+  // return <IndexComponent />;
+  // return <IndexComponentBinding></IndexComponentBinding>;
+  return <IndexComponentBindingTwoWay></IndexComponentBindingTwoWay>;
+}
 
-  function App() {
-  
-    const [count, setCount] = useState(()=>{
-      const total = orders.reduce((total, cur)=>{
-        return (total + cur);
-      })
-      return total;
-    });
-    function handle(){
-      // setCount(count +1);
-      setCount(prevState => prevState + 1);
-    }
-
-    return (
-      <div className="App">
-      <h1>{count}</h1>
-      <button onClick={handle}>nhấn vào</button>
-      </div>
-    );
-  }
-
-  export default App;
+export default App;
