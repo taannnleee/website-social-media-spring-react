@@ -3,6 +3,8 @@ package org.example.socialmedia.authentication.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmedia.authentication.dto.CustomerDTO;
+import org.example.socialmedia.authentication.dto.reponse.ResponseData;
+import org.example.socialmedia.authentication.dto.request.RegistrationRequest;
 import org.example.socialmedia.common.entities.Customer;
 import org.example.socialmedia.authentication.service.CustomerService;
 import org.example.socialmedia.common.Enum.EMessage;
@@ -24,22 +26,15 @@ import static org.example.socialmedia.common.Enum.EMessage.*;
 public class AuthenticationController {
     private static final Logger log = LogManager.getLogger(AuthenticationController.class);
     private final CustomerService customerService;
-    private final EmailService emailService;
-    private final AccountService accountService;
-
-    @PostMapping("/register")
-    public ResponseEntity<?> checkRegister(@RequestBody CustomerDTO customerDTO,
-                                           @RequestParam("city") String city,
-                                           @RequestParam("district") String district,
-                                           @RequestParam("street") String street) {
-        try {
-            // Trả về một đối tượng JSON chứa kết quả của quá trình đăng ký
-            log.info("success");
-            return ResponseEntity.ok().body("Registration successful!");
-        } catch (Exception e) {
-            // Xử lý lỗi và trả về một đối tượng JSON chứa thông báo lỗi
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Registration failed: " + e.getMessage());
-        }
+    @GetMapping("index")
+    public ResponseData<Customer> index(){
+        Customer customer =  customerService.getCustomerByEmail("leetaan1902@gmail.com");
+        return new ResponseData<>(HttpStatus.CREATED.value(), "Success", customer);
     }
+//    @PostMapping("/register")
+//    public void register(RegistrationRequest request){
+//
+//    }
+
 }
 
