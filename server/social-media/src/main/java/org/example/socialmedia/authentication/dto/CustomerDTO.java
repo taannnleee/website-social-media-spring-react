@@ -8,6 +8,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.example.socialmedia.common.Enum.ERole;
 import org.example.socialmedia.common.entities.Address;
+import org.example.socialmedia.common.util.EnumPattern;
 import org.example.socialmedia.common.util.PhoneNumber;
 import org.modelmapper.internal.bytebuddy.implementation.bind.annotation.Empty;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,6 +53,7 @@ public class CustomerDTO implements Serializable {
 
     private String repeatPassword;
 
+    @EnumPattern(name = "role", regexp = "USER|ADMIN")
     private ERole role;
 
 
