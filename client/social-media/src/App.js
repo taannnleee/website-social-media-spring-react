@@ -1,12 +1,9 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import YourComponent from "./authencation";
 
 function App() {
-  return (
-    <div className="App">
-      <a>hehehee</a>
-    </div>
-  );
+  return <YourComponent></YourComponent>;
 }
 
 export default App;

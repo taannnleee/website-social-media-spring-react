@@ -1,5 +1,5 @@
-FROM opensuse:17
-ARG FILE_JAR=target/social-media-0.0.1-SNAPSHOT.jar
+FROM openjdk:17
+ARG FILE_JAR=target/social-media.jar
 
 ADD ${FILE_JAR} api-service.jar
 
