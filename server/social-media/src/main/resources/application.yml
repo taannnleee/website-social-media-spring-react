@@ -1,42 +1,29 @@
+spring:
+  application:
+    name: social-media
+  datasource:
+    url: jdbc:mysql://localhost:3306/social-media?createDatabaseIfNotExist=true
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+openapi:
+  service:
+    api-docs: api-service
+    server: http://localhost:8080
+    title: API Service
+    version: 1.0.0
+
+#server:
+#  port: 8089
 #spring:
 #  application:
 #    name: social-media
 #  profiles:
-#    active: dev
-#---
-#spring:
-#  config:
-#    activate:
-#      on-profile: dev
-#openapi:
-#  service:
-#    api-docs: api-service
-#    server: http://localhost:8080
-#    title: API Service
-#    version: 1.0.0
-#---
-#server:
-#  port: 8081
-#spring:
-#  config:
-#    activate:
-#      on-profile: test
-#openapi:
-#  service:
-#    api-docs: api-service
-#    server: http://localhost:${server.port}
-#    title: API Service
-#    version: 1.0.0
-#---
-#server:
-#  port: 8082
-#spring:
-#  config:
-#    activate:
-#      on-profile: prod
-#openapi:
-#  service:
-#    api-docs: api-service
-#    server: http://localhost:${server.port}
-#    title: API Service
-#    version: 1.0.0
+#    active: @spring.profiles.active@
