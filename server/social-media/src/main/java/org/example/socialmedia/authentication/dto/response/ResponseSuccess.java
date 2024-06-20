@@ -1,4 +1,4 @@
-package org.example.socialmedia.authentication.dto.reponse;
+package org.example.socialmedia.authentication.dto.response;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

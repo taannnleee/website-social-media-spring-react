@@ -1,25 +1,18 @@
 package org.example.socialmedia.authentication.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.example.socialmedia.authentication.dto.CustomerDTO;
-import org.example.socialmedia.authentication.dto.reponse.ResponseData;
-import org.example.socialmedia.authentication.dto.reponse.ResponseSuccess;
+import org.example.socialmedia.authentication.dto.CustomerDTO1;
+import org.example.socialmedia.authentication.dto.response.ResponseData;
+import org.example.socialmedia.authentication.dto.response.ResponseSuccess;
 import org.example.socialmedia.authentication.repositories.CustomerRepository;
 import org.example.socialmedia.authentication.service.CustomerService;
 import org.example.socialmedia.common.entities.Customer;
-import org.example.socialmedia.sendEmail.service.AccountService;
-import org.example.socialmedia.sendEmail.service.EmailService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +32,7 @@ public class TestController {
 
 
     @PostMapping("/test")
-    public ResponseEntity<?> checkRegister(@Valid @RequestBody CustomerDTO customerDTO,
+    public ResponseEntity<?> checkRegister(@Valid @RequestBody CustomerDTO1 customerDTO,
                                            @RequestParam("city") String city,
                                            @RequestParam("district") String district,
                                            @RequestParam("street") String street) {
@@ -70,7 +63,7 @@ public class TestController {
 
     @Operation(summary = "Add user", description = "API create new user")
     @GetMapping("test")
-    public ResponseData<Integer> get(){
+    public ResponseData<?> get(){
         return new ResponseData<>(HttpStatus.CREATED.value(), "Success", 1);
     }
 
