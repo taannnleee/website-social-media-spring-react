@@ -1,4 +1,3 @@
-
 # Stage 1: Build the application
 FROM --platform=linux/amd64 maven:3.8.3-openjdk-17 AS build
 WORKDIR /social-media
@@ -25,3 +24,13 @@ COPY --from=build /social-media/target/social-media.jar .
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "social-media.jar"]
+
+#FROM openjdk:17
+#ARG FILE_JAR=target/social-media.jar
+#
+#ADD ${FILE_JAR} api-service.jar
+#
+#ENTRYPOINT ["java","-jar","api-service.jar"]\
+#
+#EXPOSE 8080
+
