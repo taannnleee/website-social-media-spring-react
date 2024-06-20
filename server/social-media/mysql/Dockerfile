@@ -1,6 +1,6 @@
-FROM mysql:latest
-
-ENV MYSQL_ROOT_PASSWORD=root
-ENV MYSQL_DATABASE=SocialMedia
-
-EXPOSE 3306
+#FROM mysql:latest
+#
+#ENV MYSQL_ROOT_PASSWORD=root
+#ENV MYSQL_DATABASE=SocialMedia
+#
+#EXPOSE 3306
