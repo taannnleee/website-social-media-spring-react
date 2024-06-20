@@ -17,9 +17,11 @@ FROM --platform=linux/amd64 openjdk:17-jdk-slim AS runtime
 WORKDIR /social-media
 
 # Copy the built JAR file from the previous stage
-COPY --from=build /api-service/target/api-service.jar .
+#COPY --from=build /api-service/target/api-service.jar .
+COPY --from=build /social-media/target/social-media.jar .
 
 # Expose the port on which the application will run
+
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "api-service.jar"]
+ENTRYPOINT ["java", "-jar", "social-media.jar"]
