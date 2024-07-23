@@ -4,9 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.example.socialmedia.authentication.dto.CustomerDTO1;
+import lombok.extern.slf4j.Slf4j;
+import org.example.socialmedia.authentication.dto.CustomerDTO;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.dto.response.ResponseSuccess;
 import org.example.socialmedia.authentication.repositories.CustomerRepository;
@@ -23,16 +22,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Validated
+@Slf4j
 @Tag(name = "Test Controller")
 public class TestController {
 
     private final CustomerService customerService;
     private final CustomerRepository customerRepository;
-    private static final Logger log = LogManager.getLogger(AuthenticationController.class);
-
 
     @PostMapping("/test")
-    public ResponseEntity<?> checkRegister(@Valid @RequestBody CustomerDTO1 customerDTO,
+    public ResponseEntity<?> checkRegister(@Valid @RequestBody CustomerDTO customerDTO,
                                            @RequestParam("city") String city,
                                            @RequestParam("district") String district,
                                            @RequestParam("street") String street) {
@@ -74,7 +72,12 @@ public class TestController {
     }
 
     @PostMapping("/getAll")
-    public List<Customer> getAll(){
-        return  customerRepository.findAll();
+    public ResponseData<?> getAll(){
+        log.info("temp");
+//        CustomerDTO customerDTO = CustomerDTO.builder()
+//                .id(1L)
+//                .email("letan")
+//                .build();
+        return new ResponseData<>(HttpStatus.CREATED.value(), "Success", customerRepository.findAll());
     }
 }
