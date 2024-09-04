@@ -1,6 +1,6 @@
 package org.example.socialmedia.authentication.repositories;
 
-import org.example.socialmedia.common.entities.Customer;
+import org.example.socialmedia.common.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
+    List<User> findAll();
 
-    Optional<Customer> findByEmail(String email);
-
-    List<Customer> findAll();
-    long count();
-
+    Optional<User> findByEmail(String email);
+    Optional<User> findByPhone(String phone);
 }
