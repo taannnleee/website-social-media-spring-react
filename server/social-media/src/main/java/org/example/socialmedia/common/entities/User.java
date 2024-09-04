@@ -1,15 +1,13 @@
 package org.example.socialmedia.common.entities;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import javax.print.attribute.standard.Media;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,12 +20,12 @@ import java.util.List;
 
 // implements UserDetails
 public class User extends AbstractEntity<Long> {
-    private String username;
     private String fullname;
     private String phone;
     private String email;
     private String password;
-
+    private Date dateOfBirth;
+    private String gender;
     @OneToMany(mappedBy = "user")
     private List<GroupHasUser> groupHasUsers;
 
