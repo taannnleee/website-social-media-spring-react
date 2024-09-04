@@ -1,9 +1,8 @@
 package org.example.socialmedia.common.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
-
-import java.io.Serializable;
 
 @Entity
 @Table(name = "Address")
@@ -12,28 +11,9 @@ import java.io.Serializable;
 @Builder
 @Getter
 @Setter
-public class Address implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id")
-    private Long addressId;
-
-    @Column(name = "city")
+public class Address extends AbstractEntity<Long> {
+    private String name;
+    private String street;
     private String city;
-
-    @Column(name = "district")
-    private String district;
-
-    @Column(name = "stress")
-    private String stress;
-
-    @OneToOne
-    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id")
-    private Customer customer;
-
-    public Address(String city, String district, String stress) {
-        this.city = city;
-        this.district = district;
-        this.stress = stress;
-    }
+    private String state;
 }
