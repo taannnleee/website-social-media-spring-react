@@ -14,5 +14,6 @@ public interface UserService {
     ResponseData<?> registerUser(RegistrationRequest registrationRequest);
     User findByPhone(String phoneNumber);
     User checkLogin(LoginRequest loginRequest);
+    boolean changePassword(String email, String newPassword);
 //    UserDetailsService userDetailsService();
 }

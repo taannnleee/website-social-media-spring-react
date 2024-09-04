@@ -77,40 +77,60 @@ public class AuthenticationController {
     }
 
 
-
     @PostMapping("/otp")
     public ResponseData<?> sendOTP(@RequestParam String email,
                                    HttpSession session,
-                                   Model model){
-        try{
+                                   Model model) {
+        try {
             String OTP = OTPGenerator.generateOTP();
-            emailService.sendEmail(email,EMessage.TITLE_OTP.getValue(),EMessage.TEXT_EMAIL_OTP.getValue()+OTP);
+            emailService.sendEmail(email, EMessage.TITLE_OTP.getValue(), EMessage.TEXT_EMAIL_OTP.getValue() + OTP);
             session.setAttribute("OTP", OTP);
             session.setAttribute("OTP_EMAIL", email);
             return new ResponseData<>(HttpStatus.OK.value(), "Success");
-        }catch (UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
         }
     }
 
-    @PostMapping("/otp")
+
+    @PostMapping("/verify-otp")
     public ResponseData<?> verifyOTP(@RequestParam String otp,
-                                   HttpSession session,
-                                   Model model){
-        try{
+                                     HttpSession session) {
+        try {
             // Lấy OTP từ session
             String sessionOtp = (String) session.getAttribute("OTP");
             String sessionEmail = (String) session.getAttribute("OTP_EMAIL");
 
-            if(sessionOtp.equals(otp)){
-                return new ResponseData<>(HttpStatus.OK.value(), "Success");
-            }else {
-                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
+            if (sessionOtp == null || sessionEmail == null) {
+                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "OTP session has expired or is invalid");
             }
 
-        }catch (UserNotFoundException e){
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
+            if (sessionOtp.equals(otp)) {
+                session.removeAttribute("OTP");
+                session.removeAttribute("OTP_EMAIL");
+                return new ResponseData<>(HttpStatus.OK.value(), "Success");
+            } else {
+                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Invalid OTP");
+            }
+
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while verifying OTP");
+        }
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseData<?> changePassword(@RequestParam String email,
+                                          @RequestParam String newPassword) {
+        try {
+            boolean isChanged = userService.changePassword(email, newPassword);
+
+            if (isChanged) {
+                return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully");
+            } else {
+                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "User not found");
+            }
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while changing the password");
         }
     }
 }
-
