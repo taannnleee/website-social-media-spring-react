@@ -43,25 +43,39 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegistrationRequest registrationRequest) {
+    public ResponseData<?> registerUser(@RequestBody RegistrationRequest registrationRequest) {
         try {
+            System.out.println("hahaa");
+            System.out.println(registrationRequest.getEmail());
+            System.out.println(registrationRequest.getPassword());
+            System.out.println(registrationRequest.getPhone());
+            System.out.println(registrationRequest.getFullname());
             userService.findByPhone(registrationRequest.getPhone());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Phone number already exists");
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Phone number already exists");
         } catch (UserNotFoundException e) {
             userService.registerUser(registrationRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+            return new ResponseData<>(HttpStatus.OK.value(), "User registered successfully");
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseData<?> login(@RequestBody LoginRequest loginRequest) {
+        System.out.println("hihi");
+        System.out.println(loginRequest.getPhoneNumber());
+        System.out.println(loginRequest.getPassword());
         User user = userService.checkLogin(loginRequest);
         if (user != null) {
-            return ResponseEntity.status(HttpStatus.OK).body("Login successful");
+            return new ResponseData<>(HttpStatus.OK.value(), "Login successful");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid phone number or password");
+            return new ResponseData<>(HttpStatus.UNAUTHORIZED.value(), "Invalid phone number or password");
         }
     }
+
+    @GetMapping("/test1")
+    public ResponseData<?> test() {
+        return new ResponseData<>(HttpStatus.OK.value(), "OKELA");
+    }
+
 
 
     @PostMapping("/otp")
@@ -69,13 +83,33 @@ public class AuthenticationController {
                                    HttpSession session,
                                    Model model){
         try{
-            User user = userService.findByEmail(email);
             String OTP = OTPGenerator.generateOTP();
             emailService.sendEmail(email,EMessage.TITLE_OTP.getValue(),EMessage.TEXT_EMAIL_OTP.getValue()+OTP);
-            return new ResponseData<>(HttpStatus.CREATED.value(), "Success");
+            session.setAttribute("OTP", OTP);
+            session.setAttribute("OTP_EMAIL", email);
+            return new ResponseData<>(HttpStatus.OK.value(), "Success");
         }catch (UserNotFoundException e){
-            model.addAttribute("result", EMessage.CUSTOMER_NOT_EXIST.getValue());
-            return new ResponseData<>(HttpStatus.CREATED.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
+        }
+    }
+
+    @PostMapping("/otp")
+    public ResponseData<?> verifyOTP(@RequestParam String otp,
+                                   HttpSession session,
+                                   Model model){
+        try{
+            // Lấy OTP từ session
+            String sessionOtp = (String) session.getAttribute("OTP");
+            String sessionEmail = (String) session.getAttribute("OTP_EMAIL");
+
+            if(sessionOtp.equals(otp)){
+                return new ResponseData<>(HttpStatus.OK.value(), "Success");
+            }else {
+                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
+            }
+
+        }catch (UserNotFoundException e){
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
         }
     }
 }
