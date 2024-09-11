@@ -22,6 +22,10 @@ openapi:
     title: API Service
     version: 1.0.0
 
+jwt:
+  expiryTime: 100*60*60*24
+  secretKey: ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+  refreshkey: d6cc0a088c07683c65cd266860cab8d94b3a1937b17420d9da30ca299c09fb77
 #server:
 #  port: 8089
 #spring:
