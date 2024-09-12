@@ -8,6 +8,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class RegistrationRequest {
+    private String username;
     private String fullname;
     private String email;
     private String phone;

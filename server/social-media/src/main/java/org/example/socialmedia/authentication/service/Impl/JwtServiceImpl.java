@@ -50,15 +50,15 @@ public class JwtServiceImpl implements JwtService {
     }
 
 
-    @Override
-    public Boolean isValid(String token,ETokenType tokenType, UserDetails userDetails) {
-        final String username = extractUsername(token,tokenType);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpried(token,tokenType)) ;
-    }
+        @Override
+        public Boolean isValid(String token,ETokenType tokenType, UserDetails userDetails) {
+            final String username = extractUsername(token,tokenType);
+            return (username.equals(userDetails.getUsername()) && !isTokenExpried(token,tokenType)) ;
+        }
 
-    private boolean isTokenExpried(String token, ETokenType tokenType) {
-        return  extractExpration(token,tokenType).before(new Date());
-    }
+        private boolean isTokenExpried(String token, ETokenType tokenType) {
+            return  extractExpration(token,tokenType).before(new Date());
+        }
 
     private Date extractExpration(String token, ETokenType tokenType) {
         return  extractClaim(token, tokenType,Claims::getExpiration);

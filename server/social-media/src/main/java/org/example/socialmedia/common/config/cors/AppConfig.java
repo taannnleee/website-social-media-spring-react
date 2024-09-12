@@ -31,14 +31,14 @@ public class AppConfig {
     private final PreFilter preFilter;
 
 //    private String[] WHITE_LIST = {"/api/**"};
-    private String[] WHITE_LIST = {"/api/login", "/api/refresh", "/api/logout"};
+    private String[] WHITE_LIST = {"/api/login", "/api/refresh", "/api/logout","/api/register"};
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/**")
+                registry.addMapping("**")
 //                        .allowedOrigins("http://localhost:8500")
                         .allowedMethods("GET", "POST", "PUT", "DELETE") // Allowed HTTP methods
                         .allowedHeaders("*") // Allowed request headers

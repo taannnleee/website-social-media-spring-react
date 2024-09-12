@@ -12,11 +12,14 @@ import org.example.socialmedia.common.Enum.ETokenType;
 import org.example.socialmedia.common.entities.Token;
 import org.example.socialmedia.common.entities.User;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.sound.midi.InvalidMidiDataException;
 import java.util.Optional;
@@ -37,11 +40,13 @@ public class AuthencationService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         }
         catch (BadCredentialsException e) {
-        }catch (UsernameNotFoundException e) {
-            throw new RuntimeException("Username or Password is incorrect");
+//            throw new RuntimeException("Username or Password is incorrect", e);
+        } catch (UsernameNotFoundException e) {
+            throw new AuthenticationCredentialsNotFoundException("Username or Password is incorrect", e);
         } catch (Exception e) {
-            throw new RuntimeException("Authentication failed: " + e.getMessage());
+            throw new AuthenticationCredentialsNotFoundException("Authentication failed: " + e.getMessage(), e);
         }
+
         var user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username or Password is incorrect"));
 
         String accessToken =  jwtService.generateToken(user);

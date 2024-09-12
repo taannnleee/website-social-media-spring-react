@@ -45,13 +45,12 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseData<?> registerUser(@RequestBody RegistrationRequest registrationRequest) {
         try {
-            System.out.println("hahaa");
             System.out.println(registrationRequest.getEmail());
             System.out.println(registrationRequest.getPassword());
             System.out.println(registrationRequest.getPhone());
             System.out.println(registrationRequest.getFullname());
-            userService.findByPhone(registrationRequest.getPhone());
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Phone number already exists");
+            userService.checkUserExist(registrationRequest.getUsername(),registrationRequest.getPhone());
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Phone number and username already exists");
         } catch (UserNotFoundException e) {
             userService.registerUser(registrationRequest);
             return new ResponseData<>(HttpStatus.OK.value(), "User registered successfully");
@@ -141,5 +140,10 @@ public class AuthenticationController {
         } catch (Exception e) {
             return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while changing the password");
         }
+    }
+
+    @GetMapping("/getProfile")
+    public ResponseData<?> getProfile(@PathVariable("id") String id){
+        return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully",userRepository.findById(Long.valueOf(id)));
     }
 }

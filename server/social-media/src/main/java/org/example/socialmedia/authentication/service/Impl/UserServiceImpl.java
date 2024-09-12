@@ -40,10 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailsService userDetailsService() {
-        UserDetailsService userDetailsService = username ->
+        return username ->
                 userRepository.findByUsername(username)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return userDetailsService;
     }
 
     @Override
@@ -65,6 +64,31 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByPhone(phoneNumber)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
+
+    @Override
+    public User findByUserName(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    @Override
+    public User checkUserExist(String username, String phoneNumber) {
+        try {
+            // Kiểm tra người dùng tồn tại với tên người dùng
+            User userByUsername = findByUserName(username);
+
+            // Kiểm tra người dùng tồn tại với số điện thoại
+            User userByPhone = findByPhone(phoneNumber);
+
+            // Nếu cả hai đều tồn tại, trả về người dùng (hoặc tùy theo yêu cầu của bạn)
+            return userByUsername;
+
+        } catch (UserNotFoundException e) {
+            // Xử lý ngoại lệ: nếu không tìm thấy người dùng nào theo tên người dùng hoặc số điện thoại
+            throw new UserNotFoundException("User with username or phone number not found");
+        }
+    }
+
 
     @Override
     public User checkLogin(LoginRequest loginRequest) {
