@@ -33,7 +33,7 @@ public class Child implements Serializable{
 
     private String gender;
 
-    private String classroom;
+    private int classId;
 
     private String facePhoto;
 
