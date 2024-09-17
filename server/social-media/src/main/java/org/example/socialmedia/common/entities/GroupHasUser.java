@@ -19,7 +19,7 @@ public class GroupHasUser extends AbstractEntity<Long>{
     private Group group;
 
     @ManyToOne
-    @JoinColumn(name = "user_idd")
+    @JoinColumn(name = "user_id")
     private User user;
 
 }
