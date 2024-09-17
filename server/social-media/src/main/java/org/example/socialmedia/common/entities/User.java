@@ -29,11 +29,16 @@ public class User extends AbstractEntity<Long> implements UserDetails, Serializa
     private String password;
     private Date dateOfBirth;
     private String gender;
+    private boolean status;
+
     @OneToMany(mappedBy = "user")
     private List<GroupHasUser> groupHasUsers;
 
     @OneToMany(mappedBy = "user")
     private List<UserHasRole> userHasRoles;
+
+    @OneToMany(mappedBy = "user")
+    private List<Address> addresses ;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

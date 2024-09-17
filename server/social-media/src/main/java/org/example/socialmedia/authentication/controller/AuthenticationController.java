@@ -48,7 +48,7 @@ public class AuthenticationController {
     public ResponseData<?> registerUser(@RequestBody RegistrationRequest registrationRequest) {
         try {
             userService.checkUser(registrationRequest);
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Phone number or username already exists");
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Phone number,username or email already exists");
         }
         catch (InvalidPasswordException e) {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Passwords do not match");
@@ -80,13 +80,18 @@ public class AuthenticationController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseData<?> resetPassword(@RequestBody String secretKey) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", authencationService.resetPassword(secretKey));
+    public ResponseData<?> resetPassword(@RequestBody String OTP,String email) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", authencationService.resetPassword(OTP, email));
     }
 
     @PostMapping("/change-password")
     public ResponseData<?> changePassword(@RequestBody ResetPasswordDTO request) {
         return new ResponseData<>(HttpStatus.OK.value(), "Success", authencationService.changePassword(request));
+    }
+
+    @GetMapping("/getProfile")
+    public ResponseData<?> getProfile(@PathVariable("id") String id){
+        return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully",userRepository.findById(Long.valueOf(id)));
     }
 
 
@@ -147,8 +152,5 @@ public class AuthenticationController {
 //        }
 //    }
 
-    @GetMapping("/getProfile")
-    public ResponseData<?> getProfile(@PathVariable("id") String id){
-        return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully",userRepository.findById(Long.valueOf(id)));
-    }
+
 }

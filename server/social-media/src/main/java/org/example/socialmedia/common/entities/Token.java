@@ -24,6 +24,7 @@ public class Token extends AbstractEntity<Long> implements Serializable {
     private String username;
     private String accessToken;
     private String refreshToken;
+    private String OTP;
 
 
 }

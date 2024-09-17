@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
         User user = Mappers.convertToEntity(registrationRequest, User.class);
         user.setPassword(encodedPassword);
+        user.setStatus(false);
         userRepository.save(user);
 
         return new ResponseData<>(HttpStatus.CREATED.value(), "Success", registrationRequest);
@@ -94,6 +95,8 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUserByPhone = findByPhone(registrationRequest.getPhone());
 
+        Optional<User>optionalUserByEmail = findByEmail(registrationRequest.getEmail());
+
         if (optionalUserByUsername.isPresent()) {
             return optionalUserByUsername.get();
         }
@@ -102,7 +105,11 @@ public class UserServiceImpl implements UserService {
             return optionalUserByPhone.get();
         }
 
-        throw new UserNotFoundException("Username and phone number not found.");
+        if (optionalUserByEmail.isPresent()) {
+            return optionalUserByEmail.get();
+        }
+
+        throw new UserNotFoundException("Username, phone or email number not found.");
     }
 
 
