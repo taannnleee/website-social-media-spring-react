@@ -24,12 +24,13 @@ const LoginScreen = () => {
 
       const responseData = await response.json();
       if (responseData.status === 200) {
-        const { id } = responseData.data;
+        const userid  = responseData.data.userid;
 
+        Alert.alert('Success',  'L'+userid);
         // saveUser(id, username, ''); 
 
-        navigation.navigate('AboutMeScreen');
-        Alert.alert('Success',  'Login successful');
+        // navigation.navigate('AboutMeScreen');
+        // Alert.alert('Success',  'Login successful');
      
       } else {
         Alert.alert('Error',  'Username or password is incorrect.'); 

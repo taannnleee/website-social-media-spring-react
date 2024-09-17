@@ -46,11 +46,11 @@ const RegisterScreen = () => {
         setPassword('');
         setConfirmPassword('');
       } else {
-        Alert.alert('Error', responseData.message +"tt" || 'An error occurred.');
+        Alert.alert('Error', responseData.message || 'An error occurred.');
       }
       
     } catch (error) {
-      Alert.alert('Error', responseData.message +"tata"|| 'An error occurred while registering. Please try again later.');
+      Alert.alert('Error', responseData.message || 'An error occurred while registering. Please try again later.');
       console.error('Error:', error);
     }
   };
