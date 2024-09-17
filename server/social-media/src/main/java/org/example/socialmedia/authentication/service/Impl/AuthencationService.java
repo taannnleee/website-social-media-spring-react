@@ -7,6 +7,9 @@ import org.example.socialmedia.authentication.dto.request.LoginRequest;
 import org.example.socialmedia.authentication.dto.request.ResetPasswordDTO;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.dto.response.TokenRespone;
+import org.example.socialmedia.authentication.exception.InvalidOtpException;
+import org.example.socialmedia.authentication.exception.PasswordMismatchException;
+import org.example.socialmedia.authentication.exception.TokenNotFoundException;
 import org.example.socialmedia.authentication.exception.UserNotFoundException;
 import org.example.socialmedia.authentication.repositories.UserRepository;
 import org.example.socialmedia.authentication.service.JwtService;
@@ -122,69 +125,93 @@ public class AuthencationService {
     }
 
     public String forgotPassword(String email) {
-        //check email exist or not
-        Optional<User> user = userService.findByEmail(email);
-
-        //user is active or inactivated
-        if(user.isPresent()){
-            if(!user.get().isEnabled()){
-                throw new InvalidDataAccessApiUsageException("User is active");
-            }
+        // Check if email exists
+        Optional<User> userOptional = userService.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("User with this email does not exist");
         }
 
+        User user = userOptional.get();
+
+        // Check if user is active
+        if (!user.isEnabled()) {
+            throw new InvalidDataAccessApiUsageException("User is not active");
+        }
 
         //generate reset token
 //        String resetToken = jwtService.generateResetToken(user.get());
 
-        //send email confirm
+        // Generate OTP and send email
         String OTP = OTPGenerator.generateOTP();
         emailService.sendEmail(email, EMessage.TITLE_OTP.getValue(), EMessage.TEXT_EMAIL_OTP.getValue() + OTP);
 
-        // save into database OTP
-        Token token = tokenService.getTokenByUsername(user.get().getUsername());
-        token.setOTP(OTP);
+        // Save OTP into database
+        Token token = tokenService.getTokenByUsername(user.getUsername());
+        if (token == null) {
+            token = new Token();
+            token.setUsername(user.getUsername());
+        }
+        token.setOTP(OTP);  // Overwrite or set new OTP
         tokenService.save(token);
 
-        String confirmLink="";
-        System.out.println("sent");
-        return "Sent";
+        // Return success response
+        System.out.println("OTP sent to email: " + email);
+        return "OTP sent successfully";
 
     }
 
-    public ResponseData<?> resetPassword(String OTP, String email) {
+    public void resetPassword(String OTP, String email) {
         Optional<User> user = userService.findByEmail(email);
-        if (user.isPresent()) {
-            Token token = tokenService.getTokenByUsername(user.get().getUsername());
-            if (token == null) {
-                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Token not found");
-            }
-            if (OTP.equals(token.getOTP())) {
-                return new ResponseData<>(HttpStatus.OK.value(), "OTP is valid. Proceed with password reset.");
-            } else {
-                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Invalid OTP");
-            }
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not found");
         }
-        return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "User not found");
+
+        Token token = tokenService.getTokenByUsername(user.get().getUsername());
+        if (token == null) {
+            throw new TokenNotFoundException("Token not found");
+        }
+
+        if (!OTP.equals(token.getOTP())) {
+            throw new InvalidOtpException("Invalid OTP");
+        }
     }
 
-    public ResponseData<?> changePassword(ResetPasswordDTO request) {
+    public String changePassword(ResetPasswordDTO request) {
 
         Optional<User> user = userService.findByEmail(request.getEmail());
         if (user.isEmpty()) {
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "User not found");
+            throw new UserNotFoundException("User not exist");
         }
 
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Passwords do not match");
+            throw new PasswordMismatchException("Passwords do not match");
         }
 
         String encryptedPassword = passwordEncoder.encode(request.getPassword());
         User currentUser = user.get();
         currentUser.setPassword(encryptedPassword);
-        userService.saveUser(currentUser);  // Giả sử bạn đã có phương thức lưu user
+        userService.saveUser(currentUser);
 
-        return new ResponseData<>(HttpStatus.OK.value(), "Password successfully changed");
+        return "Password successfully changed";
     }
+
+    public void verifyOTP_register(String OTP, String email) {
+
+        Optional<User> user = userService.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        Token token = tokenService.getTokenByUsername(user.get().getUsername());
+        if (token == null) {
+            throw new TokenNotFoundException("Token not found");
+        }
+
+        if (!OTP.equals(token.getOTP())) {
+            throw new InvalidOtpException("Invalid OTP");
+        }
+    }
+
 
 //    public String resetPassword(String secretKey) {
 //        final String userName = jwtService.extractUsername(secretKey, RESETTOKEN);

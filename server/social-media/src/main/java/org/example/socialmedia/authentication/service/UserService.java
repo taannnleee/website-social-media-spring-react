@@ -15,7 +15,7 @@ public interface UserService {
     Optional<User>  findByUserName(String username);
 
     User checkUser(RegistrationRequest registrationRequest);
-    ResponseData<?> registerUser(RegistrationRequest registrationRequest);
+    RegistrationRequest registerUser(RegistrationRequest registrationRequest);
     Optional<User> findByPhone(String phoneNumber);
     User checkLogin(LoginRequest loginRequest);
     boolean changePassword(String email, String newPassword);

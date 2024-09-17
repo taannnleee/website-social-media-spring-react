@@ -35,6 +35,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     @Lazy
+    private AuthencationService authencationService;
+
+    @Autowired
+    @Lazy
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -53,14 +57,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseData<?> registerUser(RegistrationRequest registrationRequest) {
+    public RegistrationRequest registerUser(RegistrationRequest registrationRequest) {
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
         User user = Mappers.convertToEntity(registrationRequest, User.class);
         user.setPassword(encodedPassword);
         user.setStatus(false);
         userRepository.save(user);
+        authencationService.forgotPassword(registrationRequest.getEmail());
 
-        return new ResponseData<>(HttpStatus.CREATED.value(), "Success", registrationRequest);
+        return registrationRequest;
     }
 
     @Override
