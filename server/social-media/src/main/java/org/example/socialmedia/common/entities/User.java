@@ -3,6 +3,8 @@ package org.example.socialmedia.common.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.print.attribute.standard.Media;
 import java.io.Serializable;
@@ -18,8 +20,9 @@ import java.util.List;
 @Getter
 @Setter
 
-// implements UserDetails
-public class User extends AbstractEntity<Long> {
+
+public class User extends AbstractEntity<Long> implements UserDetails, Serializable {
+    private String username;
     private String fullname;
     private String phone;
     private String email;
@@ -32,33 +35,28 @@ public class User extends AbstractEntity<Long> {
     @OneToMany(mappedBy = "user")
     private List<UserHasRole> userHasRoles;
 
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return List.of();
-//    }
-//
-//    @Override
-//    public String getUsername() {
-//        return "";
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return true;
-//    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
