@@ -4,10 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.socialmedia.authentication.dto.request.LoginRequest;
+import org.example.socialmedia.authentication.dto.request.ResetPasswordDTO;
 import org.example.socialmedia.authentication.dto.response.TokenRespone;
 import org.example.socialmedia.authentication.repositories.UserRepository;
 import org.example.socialmedia.authentication.service.JwtService;
 import org.example.socialmedia.authentication.service.TokenService;
+import org.example.socialmedia.authentication.service.UserService;
 import org.example.socialmedia.common.Enum.ETokenType;
 import org.example.socialmedia.common.entities.Token;
 import org.example.socialmedia.common.entities.User;
@@ -18,14 +20,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.sound.midi.InvalidMidiDataException;
+import java.io.StringReader;
 import java.util.Optional;
 
-import static org.example.socialmedia.common.Enum.ETokenType.ACCESSTOKEN;
-import static org.example.socialmedia.common.Enum.ETokenType.REFRESHTOKEN;
+import static org.example.socialmedia.common.Enum.ETokenType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,17 +37,15 @@ public class AuthencationService {
     private  final UserRepository userRepository;
     private  final JwtService jwtService;
     private final TokenService tokenService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     public TokenRespone authentication(LoginRequest loginRequest){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         }
         catch (BadCredentialsException e) {
-//            throw new RuntimeException("Username or Password is incorrect", e);
-        } catch (UsernameNotFoundException e) {
-            throw new AuthenticationCredentialsNotFoundException("Username or Password is incorrect", e);
-        } catch (Exception e) {
-            throw new AuthenticationCredentialsNotFoundException("Authentication failed: " + e.getMessage(), e);
+            throw new RuntimeException("Username or Password is incorrect", e);
         }
 
         var user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username or Password is incorrect"));
@@ -111,5 +112,59 @@ public class AuthencationService {
         //delete token
         tokenService.delete(tokenCurrent);
         return "delete!";
+    }
+
+    public String forgotPassword(String email) {
+        //check email exist or not
+        Optional<User> user = userService.findByEmail(email);
+
+        //user is active or inactivated
+        if(user.isPresent()){
+            if(!user.get().isEnabled()){
+                throw new InvalidDataAccessApiUsageException("User is active");
+            }
+        }
+
+
+        //generate reset token
+        String resetToken = jwtService.generateResetToken(user.get());
+
+        //send email confirm
+        String confirmLink="";
+        System.out.println("sent");
+        return "Sent";
+
+    }
+
+    public String resetPassword(String secretKey) {
+        final String userName = jwtService.extractUsername(secretKey, RESETTOKEN);
+        User user = userService.findByUserName(userName).orElse(null);
+        if(!jwtService.isValid(secretKey, RESETTOKEN, user)){
+            throw new InvalidDataAccessApiUsageException("Token is invalid");
+        }
+        return "reset";
+    }
+
+    public String changePassword(ResetPasswordDTO request) {
+        User user = isValidUserByToken(request.getSecretKey());
+        if(!request.getPassword().equals(request.getConfirmPassword())){
+            throw new InvalidDataAccessApiUsageException("Password not match");
+        }
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userService.saveUser(user);
+        return "Changed";
+    }
+    private User isValidUserByToken(String secretKey) {
+        final String userName = jwtService.extractUsername(secretKey, RESETTOKEN);
+        User user = userService.findByUserName(userName).orElse(null);
+
+        if(!user.isEnabled()){
+            throw new InvalidDataAccessApiUsageException("User is active");
+        }
+
+        if(!jwtService.isValid(secretKey, RESETTOKEN, user)){
+            throw new InvalidDataAccessApiUsageException("Token is invalid");
+        }
+        return user;
     }
 }

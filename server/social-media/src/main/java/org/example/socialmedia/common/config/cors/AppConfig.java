@@ -31,7 +31,7 @@ public class AppConfig {
     private final PreFilter preFilter;
 
 //    private String[] WHITE_LIST = {"/api/**"};
-    private String[] WHITE_LIST = {"/api/login", "/api/refresh", "/api/logout","/api/register"};
+    private String[] WHITE_LIST = {"/api/login", "/api/refresh", "/api/logout","/api/register","/api/forgot-password"};
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
