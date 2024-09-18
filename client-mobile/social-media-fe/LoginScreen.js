@@ -33,13 +33,9 @@ const LoginScreen = () => {
 
         const user_id = await SecureStore.getItemAsync('user_id');
 
-    
-
-
-
-        
+  
         Alert.alert('Success',  'Login successful');
-        navigation.navigate('AboutMeScreen');
+        navigation.navigate('Home');
      
       } else {
         if(responseData.message ==="Accout Is Not Active"){

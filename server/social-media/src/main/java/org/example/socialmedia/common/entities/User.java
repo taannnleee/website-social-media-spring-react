@@ -36,7 +36,7 @@ public class User extends AbstractEntity<Long> implements UserDetails, Serializa
     @OneToMany(mappedBy = "user")
     private List<UserHasRole> userHasRoles;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
     private List<Address> addresses ;
 
     @Override
