@@ -9,10 +9,7 @@ import org.example.socialmedia.authentication.dto.request.RegistrationRequest;
 import org.example.socialmedia.authentication.dto.request.ResetPasswordDTO;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.dto.response.TokenRespone;
-import org.example.socialmedia.authentication.exception.InvalidOtpException;
-import org.example.socialmedia.authentication.exception.InvalidPasswordException;
-import org.example.socialmedia.authentication.exception.TokenNotFoundException;
-import org.example.socialmedia.authentication.exception.UserNotFoundException;
+import org.example.socialmedia.authentication.exception.*;
 import org.example.socialmedia.authentication.repositories.UserRepository;
 import org.example.socialmedia.authentication.service.Impl.AuthencationService;
 import org.example.socialmedia.authentication.service.UserService;
@@ -22,6 +19,7 @@ import org.example.socialmedia.sendEmail.utils.OTPGenerator;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,8 +55,8 @@ public class AuthenticationController {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Passwords do not match");
         }
         catch (UserNotFoundException e) {
-            userService.registerUser(registrationRequest);
-            return new ResponseData<>(HttpStatus.OK.value(), "User registered successfully");
+            RegistrationRequest rp = userService.registerUser(registrationRequest);
+            return new ResponseData<>(HttpStatus.OK.value(), "User registered successfully",rp);
         }
     }
 
@@ -83,6 +81,9 @@ public class AuthenticationController {
             return new ResponseData<>( HttpStatus.OK.value(),"Login Success",tokenRespone);
         }catch (BadCredentialsException e){
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(),"Bad credentials");
+        }
+        catch (AccoutIsNotActive e){
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(),"Accout Is Not Active");
         }
     }
 

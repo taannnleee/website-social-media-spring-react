@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, TextInput, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import API_URL from './Env';
 const RegisterScreen = () => {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
@@ -27,7 +27,7 @@ const RegisterScreen = () => {
     };
 
     try {
-      const response = await fetch('http://192.168.1.14:8080/api/register', {
+      const response = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,17 +36,26 @@ const RegisterScreen = () => {
       });
 
       const responseData = await response.json();
+      const statusChild  = responseData.data.status;
+      
+
       if (responseData.status === 200) {
-        Alert.alert('Success', responseData.message || 'Registration successful');
-        // navigation.navigate('');
+        
+        // Alert.alert('Success', responseData.message || 'Registration successful');
+        
         setUsername('');
         setName('');
         setPhoneNumber('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        if(statusChild === "false"){
+          navigation.navigate('VerifyOTP');
+
+        }
+        
       } else {
-        Alert.alert('Error', responseData.message || 'An error occurred.');
+        Alert.alert('Error', responseData.message);
       }
       
     } catch (error) {

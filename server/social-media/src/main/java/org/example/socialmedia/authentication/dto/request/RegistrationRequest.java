@@ -16,5 +16,6 @@ public class RegistrationRequest {
     private String confirmpassword;
     private Date dateOfBirth;
     private String gender;
+    private String status;
 
 }

@@ -65,7 +65,8 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         authencationService.forgotPassword(registrationRequest.getEmail());
 
-        return registrationRequest;
+        RegistrationRequest registrationRequest1 = Mappers.convertToDto(user, RegistrationRequest.class);
+        return registrationRequest1;
     }
 
     @Override

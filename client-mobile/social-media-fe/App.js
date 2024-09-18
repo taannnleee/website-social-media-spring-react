@@ -5,7 +5,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AboutMeScreen from './AboutMeScreen';
 import RegisterScreen from './RegisterScreen';
+import VerifyOTP from './VerifyOTP';
+import Home from './Home';
 // import ForgotPassword from './ForgotPassword';
+
 
 const Stack = createStackNavigator();
 
@@ -16,6 +19,8 @@ const App = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
         <Stack.Screen name="AboutMeScreen" component={AboutMeScreen} />
+        <Stack.Screen name="VerifyOTP" component={VerifyOTP} />
+        <Stack.Screen name="Home" component={Home} />
         
         {/* <Stack.Screen name="ForgotPassword" component={ForgotPassword} /> */}
       </Stack.Navigator>

@@ -20,7 +20,6 @@ import java.util.List;
 @Getter
 @Setter
 
-
 public class User extends AbstractEntity<Long> implements UserDetails, Serializable {
     private String username;
     private String fullname;

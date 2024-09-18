@@ -7,10 +7,7 @@ import org.example.socialmedia.authentication.dto.request.LoginRequest;
 import org.example.socialmedia.authentication.dto.request.ResetPasswordDTO;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.dto.response.TokenRespone;
-import org.example.socialmedia.authentication.exception.InvalidOtpException;
-import org.example.socialmedia.authentication.exception.PasswordMismatchException;
-import org.example.socialmedia.authentication.exception.TokenNotFoundException;
-import org.example.socialmedia.authentication.exception.UserNotFoundException;
+import org.example.socialmedia.authentication.exception.*;
 import org.example.socialmedia.authentication.repositories.UserRepository;
 import org.example.socialmedia.authentication.service.JwtService;
 import org.example.socialmedia.authentication.service.TokenService;
@@ -58,7 +55,12 @@ public class AuthencationService {
             throw new RuntimeException("Username or Password is incorrect", e);
         }
 
-        var user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username or Password is incorrect"));
+        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username or Password is incorrect"));
+
+        if(user.isStatus()==false){
+            throw new AccoutIsNotActive("Account is not active");
+        }
+
 
         String accessToken =  jwtService.generateToken(user);
         String refresh_token =  jwtService.generateRefreshToken(user);
@@ -210,6 +212,10 @@ public class AuthencationService {
         if (!OTP.equals(token.getOTP())) {
             throw new InvalidOtpException("Invalid OTP");
         }
+
+        user.get().setStatus(true);
+        userService.saveUser(user.get());
+
     }
 
 
