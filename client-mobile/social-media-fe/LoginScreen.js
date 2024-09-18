@@ -2,6 +2,26 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, TextInput, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import Realm from 'realm';
+
+// Define User schema
+const UserSchema = {
+  name: 'User',
+  properties: {
+    userid: 'string',
+    username: 'string',
+    token: 'string?',
+  },
+  primaryKey: 'userid',
+};
+
+// Initialize Realm with User schema
+const realm = new Realm({
+  schema: [UserSchema],
+  schemaVersion: 1,
+});
+
+
 const LoginScreen = () => {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +45,14 @@ const LoginScreen = () => {
       const responseData = await response.json();
       if (responseData.status === 200) {
         const userid  = responseData.data.userid;
+        const useridString  = String(userid);
+        realm.write(() => {
+          realm.create('User', {
+            userid: useridString,
+            username: username,
+            token: token,
+          }, 'modified');
+        });
 
         Alert.alert('Success',  'L'+userid);
         // saveUser(id, username, ''); 
