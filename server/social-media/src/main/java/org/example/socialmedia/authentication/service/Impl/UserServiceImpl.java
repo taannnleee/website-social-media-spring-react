@@ -2,12 +2,16 @@ package org.example.socialmedia.authentication.service.Impl;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmedia.authentication.dto.request.LoginRequest;
 import org.example.socialmedia.authentication.dto.request.RegistrationRequest;
+import org.example.socialmedia.authentication.dto.request.UpdateProfileRequest;
+import org.example.socialmedia.authentication.dto.response.ProfileResponse;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.dto.response.TokenRespone;
 import org.example.socialmedia.authentication.exception.InvalidPasswordException;
 import org.example.socialmedia.authentication.exception.UserNotFoundException;
 import org.example.socialmedia.authentication.repositories.UserRepository;
+import org.example.socialmedia.authentication.service.AddressService;
 import org.example.socialmedia.authentication.service.UserService;
+import org.example.socialmedia.common.entities.Address;
 import org.example.socialmedia.common.entities.User;
 import org.example.socialmedia.common.mapper.Mappers;
 import org.slf4j.Logger;
@@ -24,6 +28,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +50,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AddressService addressService;
+
     @Override
     public List<User> getAllUser() {
         return userRepository.findAll();
@@ -58,10 +67,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RegistrationRequest registerUser(RegistrationRequest registrationRequest) {
+        ArrayList arrayList = new ArrayList();
+        Address address = new Address();
+        arrayList.add(address);
+
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
         User user = Mappers.convertToEntity(registrationRequest, User.class);
         user.setPassword(encodedPassword);
         user.setStatus(false);
+
+        address.setUser(user);
+        user.setAddresses(arrayList);
         userRepository.save(user);
         authencationService.forgotPassword(registrationRequest.getEmail());
 
@@ -78,6 +94,44 @@ public class UserServiceImpl implements UserService {
     public long saveUser(User user) {
         userRepository.save(user);
         return user.getId();
+    }
+
+    @Override
+    public ProfileResponse getProfile(String id) {
+        Optional<User>  userOptional =  userRepository.findById(Long.valueOf(id));
+        if(userOptional.isEmpty()){
+            throw new UserNotFoundException("User not found");
+        }
+        User user = userOptional.get();
+        Address address =  addressService.findAddressByUser(user);
+        if(address == null){
+            throw new UserNotFoundException("Address not found");
+        }
+
+        ProfileResponse profileResponse = Mappers.convertToDto(user, ProfileResponse.class);
+        profileResponse.setCity(address.getCity());
+        profileResponse.setStreet(address.getStreet());
+        profileResponse.setState(address.getState());
+        return profileResponse;
+    }
+
+    @Override
+    public void  updateProfile(UpdateProfileRequest updateProfileRequest, String id) {
+        Optional<User>  userOptional =  userRepository.findById(Long.valueOf(id));
+        if(userOptional.isEmpty()){
+            throw new UserNotFoundException("User not found");
+        }
+
+        User user = userOptional.get();
+        Address address =  addressService.findAddressByUser(user);
+        address.setCity(updateProfileRequest.getCity());
+        address.setStreet(updateProfileRequest.getStreet());
+        address.setState(updateProfileRequest.getState());
+
+        User userMapper = Mappers.convertToEntity(updateProfileRequest, User.class);
+
+        user = userMapper;
+        userRepository.save(user);
     }
 
     @Override

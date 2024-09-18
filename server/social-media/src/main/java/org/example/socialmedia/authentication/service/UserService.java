@@ -3,6 +3,8 @@ package org.example.socialmedia.authentication.service;
 
 import org.example.socialmedia.authentication.dto.request.LoginRequest;
 import org.example.socialmedia.authentication.dto.request.RegistrationRequest;
+import org.example.socialmedia.authentication.dto.request.UpdateProfileRequest;
+import org.example.socialmedia.authentication.dto.response.ProfileResponse;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.common.entities.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,4 +24,8 @@ public interface UserService {
     UserDetailsService userDetailsService();
     Optional<User> findByEmail(String email);
     long saveUser(User user);
+
+    ProfileResponse getProfile(String id);
+
+    void updateProfile(UpdateProfileRequest updateProfileRequest, String id);
 }

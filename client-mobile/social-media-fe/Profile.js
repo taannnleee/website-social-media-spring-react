@@ -10,7 +10,7 @@ const Profile = () => {
     email: 'email@example.com',
     phone: '0123456789',
     city: 'Hanoi',
-    stresst: '123 Main St',
+    stress: '123 Main St',
     state: 'VN'
   });
 
@@ -64,8 +64,8 @@ const Profile = () => {
         <Text style={styles.label}>Street:</Text>
         <TextInput
           style={styles.input}
-          value={updatedData.stresst}
-          onChangeText={(text) => setUpdatedData({ ...updatedData, stresst: text })}
+          value={updatedData.stress}
+          onChangeText={(text) => setUpdatedData({ ...updatedData, stress: text })}
           editable={isEditing}
         />
 

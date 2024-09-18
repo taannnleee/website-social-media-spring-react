@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @Slf4j
 public class AuthenticationController {
     private final UserService userService;
@@ -124,9 +124,6 @@ public class AuthenticationController {
         return new ResponseData<>(HttpStatus.OK.value(), "Success", authencationService.changePassword(request));
     }
 
-    @GetMapping("/getProfile")
-    public ResponseData<?> getProfile(@PathVariable("id") String id){
-        return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully",userRepository.findById(Long.valueOf(id)));
-    }
+
 
 }
