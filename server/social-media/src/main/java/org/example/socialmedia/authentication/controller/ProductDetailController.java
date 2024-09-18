@@ -2,7 +2,6 @@ package org.example.socialmedia.authentication.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.socialmedia.authentication.dto.response.ProfileResponse;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.exception.UserNotFoundException;
 import org.example.socialmedia.authentication.repositories.UserRepository;
@@ -21,21 +20,20 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/home")
+@RequestMapping("/api/product-detail")
 @Slf4j
-public class HomeController {
+public class ProductDetailController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final AuthencationService authencationService;
     private final ProductService productService;
 
-    @GetMapping("/getAllProduct")
-    public ResponseData<?> getAllProduct(){
+    @GetMapping("/getProduct/{id}")
+    public ResponseData<?> getProductDetail(@PathVariable String id){
         try{
-            List<Product> productList =  productService.getAllProduct();
-
-            return new ResponseData<>(HttpStatus.OK.value(), "get all product successfully",productList);
+            Product product = productService.getProductById(id);
+            return new ResponseData<>(HttpStatus.OK.value(), "get all product successfully",product);
 
         }catch (UserNotFoundException e){
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());

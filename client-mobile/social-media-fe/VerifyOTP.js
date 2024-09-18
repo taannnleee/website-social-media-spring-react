@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, TextInput, StyleSheet, Alert } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import API_URL from './Env';
 
-const VerifyOTP  = () => {
+const VerifyOTP = () => {
   const [OTP, setOTP] = useState('');
   const [email, setEmail] = useState('');
   const navigation = useNavigation();
@@ -15,20 +15,33 @@ const VerifyOTP  = () => {
     formData.append('OTP', OTP);
 
     try {
-      const response = await fetch(`${API_URL}/api/verifyOTP_register`, {
+      const response = await fetch(`${API_URL}/api/auth/verifyOTP_register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',  // Đặt kiểu dữ liệu là form data
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formData.toString(),  // Chuỗi hóa dữ liệu gửi đi
+        body: formData.toString(),
       });
 
-      const responseData = await response.json();
-      if (responseData.status === 200) {
-        Alert.alert('Success', responseData.message || 'OTP verification successful.');
-        navigation.navigate('Login');
+      // Kiểm tra mã trạng thái phản hồi
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Kiểm tra loại dữ liệu phản hồi
+      const contentType = response.headers.get('Content-Type');
+      if (contentType && contentType.includes('application/json')) {
+        const responseData = await response.json();
+        if (responseData.status === 200) {
+          Alert.alert('Success', responseData.message || 'OTP verification successful.');
+          navigation.navigate('Login');
+        } else {
+          Alert.alert('Error', responseData.message);
+        }
       } else {
-        Alert.alert('Error', responseData.message);
+        // Nếu phản hồi không phải JSON
+        const text = await response.text();
+        Alert.alert('Error', `Unexpected response format: ${text}`);
       }
       
     } catch (error) {
@@ -62,7 +75,7 @@ const VerifyOTP  = () => {
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.btnText}>Back Login</Text>
+            <Text style={styles.btnText}>Back to Login</Text>
           </TouchableOpacity>
         </View>
       </View>

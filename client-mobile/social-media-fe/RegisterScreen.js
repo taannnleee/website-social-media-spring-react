@@ -27,7 +27,7 @@ const RegisterScreen = () => {
     };
 
     try {
-      const response = await fetch(`${API_URL}/api/register`, {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ const RegisterScreen = () => {
       });
 
       const responseData = await response.json();
-      const statusChild  = responseData.data.status;
+      const statusChild  = responseData.data?.status;
       
 
       if (responseData.status === 200) {
@@ -51,7 +51,6 @@ const RegisterScreen = () => {
         setConfirmPassword('');
         if(statusChild === "false"){
           navigation.navigate('VerifyOTP');
-
         }
         
       } else {

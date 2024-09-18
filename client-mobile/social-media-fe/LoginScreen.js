@@ -27,11 +27,14 @@ const LoginScreen = () => {
 
       const responseData = await response.json();
       if (responseData.status === 200) {
-        const {userid}  = responseData.data;
+        const {userid, accesstoken, refreshtoken}  = responseData.data;
         const useridString  = String(userid);
-        await SecureStore.setItemAsync('user_id', useridString);
+        const accesstokenString  = String(accesstoken);
+        const refreshtokenString  = String(refreshtoken);
 
-        const user_id = await SecureStore.getItemAsync('user_id');
+        await SecureStore.setItemAsync('user_id', useridString);
+        await SecureStore.setItemAsync('accesstoken', accesstokenString);
+        await SecureStore.setItemAsync('refreshtoken', refreshtokenString);
 
   
         Alert.alert('Success',  'Login successful');
@@ -42,14 +45,14 @@ const LoginScreen = () => {
           Alert.alert('Error',  'Accout is not active'); 
           navigation.navigate('VerifyOTP');
 
-        }else{
+        } 
+        if(responseData.message ==="Bad credentials"){
           Alert.alert('Error',  'Username or password is incorrect.'); 
         }
-        
       }
       
     } catch (error) {
-        Alert.alert('Error',  error);
+      Alert.alert('Error', 'An error occurred during login. Please try again.');
     }
   };
 

@@ -116,23 +116,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void  updateProfile(UpdateProfileRequest updateProfileRequest, String id) {
-        Optional<User>  userOptional =  userRepository.findById(Long.valueOf(id));
+    public void updateProfile(UpdateProfileRequest updateProfileRequest, String id) {
+        Optional<User> userOptional = userRepository.findById(Long.valueOf(id));
+
         if(userOptional.isEmpty()){
             throw new UserNotFoundException("User not found");
         }
 
         User user = userOptional.get();
-        Address address =  addressService.findAddressByUser(user);
+
+        // Cập nhật thông tin người dùng từ request
+        user.setFullname(updateProfileRequest.getFullname());
+        user.setUsername(updateProfileRequest.getUsername());
+        user.setEmail(updateProfileRequest.getEmail());
+        user.setPhone(updateProfileRequest.getPhone());
+
+        // Cập nhật địa chỉ
+        Address address = addressService.findAddressByUser(user);
         address.setCity(updateProfileRequest.getCity());
         address.setStreet(updateProfileRequest.getStreet());
         address.setState(updateProfileRequest.getState());
 
-        User userMapper = Mappers.convertToEntity(updateProfileRequest, User.class);
-
-        user = userMapper;
+        // Lưu lại thông tin đã được cập nhật
         userRepository.save(user);
     }
+
 
     @Override
     public Optional<User> findByPhone(String phoneNumber) {

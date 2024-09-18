@@ -1,6 +1,7 @@
 package org.example.socialmedia.common.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,7 +50,8 @@ public class ProductDetail implements Serializable {
     private String color;
 
 
-    @OneToOne(mappedBy = "productDetail", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "productDetail")
+    @JsonIgnore
     private Product product;
 
 

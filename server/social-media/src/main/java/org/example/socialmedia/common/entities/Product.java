@@ -20,7 +20,7 @@ public class Product implements Serializable {
     @Column(name = "product_id")
     private Long productID;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "product_detail_id", referencedColumnName = "product_detail_id")
     private ProductDetail productDetail;
 
