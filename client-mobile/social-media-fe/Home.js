@@ -44,7 +44,8 @@ const Home = () => {
   // Render each product item
   const renderItem = ({ item }) => (
     <View style={styles.productContainer}>
-      <Image source={{ uri: item.productDetail.imageUrl }} style={styles.productImage} />
+      {/* Ensure the image URL is fully qualified (from the server) */}
+      <Image source={{ uri: `${API_URL}/scr/images/${item.productDetail.imageUrl}` }} style={styles.productImage} />
       <Text style={styles.productName}>{item.productDetail.name}</Text>
     </View>
   );
@@ -59,7 +60,8 @@ const Home = () => {
           data={products}
           renderItem={renderItem}
           keyExtractor={(item) => item.productID.toString()}
-          numColumns={2}
+          horizontal // Allows horizontal scrolling
+          showsHorizontalScrollIndicator={false} // Hide horizontal scrollbar for a cleaner UI
           contentContainerStyle={styles.productList}
         />
       )}
@@ -76,19 +78,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   productContainer: {
-    flex: 1,
-    margin: 5,
+    width: 150, // Set a fixed width for each product item for consistent horizontal scrolling
+    margin: 10,
     alignItems: 'center',
   },
   productImage: {
     width: '100%',
-    height: 250,
+    height: 150,
     borderRadius: 10,
   },
   productName: {
     marginTop: 5,
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center', // Center the text for better display
   },
 });
 
