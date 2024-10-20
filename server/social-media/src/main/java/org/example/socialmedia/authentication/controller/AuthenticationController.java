@@ -33,6 +33,7 @@ public class AuthenticationController {
     private final EmailService emailService;
     private final AuthencationService authencationService;
 
+
 //    @GetMapping("/getAllUser")
 //    public ResponseData getAllUser() {
 //        log.info("getAllUser");
@@ -41,6 +42,7 @@ public class AuthenticationController {
 
     @GetMapping("/getAllUser")
     public ResponseData<?> getAllUser() {
+        System.out.println("hihi");
         return new ResponseData<>(HttpStatus.OK.value(), "Get all user success", userService.getAllUser());
     }
 
