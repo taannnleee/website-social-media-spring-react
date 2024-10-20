@@ -44,6 +44,7 @@ public class AuthenticationController {
     public ResponseData<?> getAllUser() {
         System.out.println("hihi");
         System.out.println("hihi");
+        System.out.println("hihi");
         return new ResponseData<>(HttpStatus.OK.value(), "Get all user success", userService.getAllUser());
     }
 
