@@ -82,6 +82,7 @@ public class AuthenticationController {
             TokenRespone tokenRespone = authencationService.authentication(loginRequest);
             return new ResponseData<>( HttpStatus.OK.value(),"Login Success",tokenRespone);
         }catch (BadCredentialsException e){
+            System.out.println("hihi");
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(),"Bad credentials");
         }
         catch (AccoutIsNotActive e){
