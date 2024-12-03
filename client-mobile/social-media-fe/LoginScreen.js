@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, TextInput, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import * as SecureStore from 'expo-secure-store'; 
+import API_URL from './Env';
 
 const LoginScreen = () => {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  const navigation = useNavigation(); // Hook điều hướng
+  const navigation = useNavigation();
 
   const handleLogin = async () => {
     const loginRequest = {
@@ -14,7 +16,8 @@ const LoginScreen = () => {
     };
 
     try {
-      const response = await fetch('http://192.168.1.14:8080/api/login', { 
+      
+      const response = await fetch(`${API_URL}/api/auth/login`, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -24,19 +27,32 @@ const LoginScreen = () => {
 
       const responseData = await response.json();
       if (responseData.status === 200) {
-        const { id } = responseData.data;
+        const {userid, accesstoken, refreshtoken}  = responseData.data;
+        const useridString  = String(userid);
+        const accesstokenString  = String(accesstoken);
+        const refreshtokenString  = String(refreshtoken);
 
-        // saveUser(id, username, ''); 
+        await SecureStore.setItemAsync('user_id', useridString);
+        await SecureStore.setItemAsync('accesstoken', accesstokenString);
+        await SecureStore.setItemAsync('refreshtoken', refreshtokenString);
 
-        navigation.navigate('AboutMeScreen');
+  
         Alert.alert('Success',  'Login successful');
+        navigation.navigate('Home');
      
       } else {
-        Alert.alert('Error',  'Username or password is incorrect.'); 
+        if(responseData.message ==="Accout Is Not Active"){
+          Alert.alert('Error',  'Accout is not active'); 
+          navigation.navigate('VerifyOTP');
+
+        } 
+        if(responseData.message ==="Bad credentials"){
+          Alert.alert('Error',  'Username or password is incorrect.'); 
+        }
       }
       
     } catch (error) {
-        Alert.alert('Error',  'Username or password is incorrect.');
+      Alert.alert('Error', 'An error occurred during login. Please try again.');
     }
   };
 

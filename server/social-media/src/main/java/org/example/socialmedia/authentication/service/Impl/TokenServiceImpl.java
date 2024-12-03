@@ -38,6 +38,6 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token getTokenByUsername(String username) {
-        return tokenRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("Token not exists"));
+        return tokenRepository.findByUsername(username).orElse(null);
     }
 }

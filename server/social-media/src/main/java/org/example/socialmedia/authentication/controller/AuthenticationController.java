@@ -9,23 +9,26 @@ import org.example.socialmedia.authentication.dto.request.RegistrationRequest;
 import org.example.socialmedia.authentication.dto.request.ResetPasswordDTO;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.dto.response.TokenRespone;
-import org.example.socialmedia.authentication.exception.InvalidPasswordException;
-import org.example.socialmedia.authentication.exception.UserNotFoundException;
+import org.example.socialmedia.authentication.exception.*;
 import org.example.socialmedia.authentication.repositories.UserRepository;
 import org.example.socialmedia.authentication.service.Impl.AuthencationService;
 import org.example.socialmedia.authentication.service.UserService;
 import org.example.socialmedia.common.Enum.EMessage;
 import org.example.socialmedia.sendEmail.service.EmailService;
 import org.example.socialmedia.sendEmail.utils.OTPGenerator;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.lang.reflect.InvocationTargetException;
 
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @Slf4j
 public class AuthenticationController {
     private final UserService userService;
@@ -54,17 +57,26 @@ public class AuthenticationController {
     public ResponseData<?> registerUser(@RequestBody RegistrationRequest registrationRequest) {
         try {
             userService.checkUser(registrationRequest);
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Phone number or username already exists");
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Phone number,username or email already exists");
         }
         catch (InvalidPasswordException e) {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Passwords do not match");
         }
         catch (UserNotFoundException e) {
-            userService.registerUser(registrationRequest);
-            return new ResponseData<>(HttpStatus.OK.value(), "User registered successfully");
+            RegistrationRequest rp = userService.registerUser(registrationRequest);
+            return new ResponseData<>(HttpStatus.OK.value(), "User registered successfully",rp);
         }
     }
 
+    @PostMapping("verifyOTP_register")
+    public ResponseData<TokenRespone> verifyOTPRegister(String OTP,  String email) {
+        try {
+            authencationService.verifyOTP_register(OTP, email);
+            return new ResponseData<>(HttpStatus.OK.value(), "OTP is valid. Proceed with register.");
+        } catch (UserNotFoundException | TokenNotFoundException | InvalidOtpException e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+    }
 
     @PostMapping("/refresh")
     public ResponseData<TokenRespone> refreshToken(HttpServletRequest request) {
@@ -72,7 +84,16 @@ public class AuthenticationController {
     }
     @PostMapping("/login")
     public ResponseData<TokenRespone> login(@RequestBody LoginRequest loginRequest) {
-        return new ResponseData<>( HttpStatus.OK.value(),"Login Success",authencationService.authentication(loginRequest));
+        try {
+            TokenRespone tokenRespone = authencationService.authentication(loginRequest);
+            return new ResponseData<>( HttpStatus.OK.value(),"Login Success",tokenRespone);
+        }catch (BadCredentialsException e){
+            System.out.println("hihi");
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(),"Bad credentials");
+        }
+        catch (AccoutIsNotActive e){
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(),"Accout Is Not Active");
+        }
     }
 
     @PostMapping("/logout")
@@ -82,12 +103,29 @@ public class AuthenticationController {
 
     @PostMapping("/forgot-password")
     public ResponseData<?> forgotPassword(@RequestBody String email) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", authencationService.forgotPassword(email));
+        try {
+            String result = authencationService.forgotPassword(email);
+            // Trả về phản hồi thành công
+            return new ResponseData<>(HttpStatus.OK.value(), "Success"+result);
+        } catch (UserNotFoundException e) {
+            // Nếu không tìm thấy người dùng
+            return new ResponseData<>(HttpStatus.NOT_FOUND.value(), "NOT_FOUND");
+        } catch (InvalidDataAccessApiUsageException e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST");
+        } catch (Exception e) {
+            // Xử lý các lỗi khác
+            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "INTERNAL_SERVER_ERROR");
+        }
     }
 
     @PostMapping("/reset-password")
-    public ResponseData<?> resetPassword(@RequestBody String secretKey) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Success", authencationService.resetPassword(secretKey));
+    public ResponseData<?> resetPassword(@RequestBody String OTP,String email) {
+        try {
+            authencationService.resetPassword(OTP, email);
+            return new ResponseData<>(HttpStatus.OK.value(), "OTP is valid. Proceed with password reset.");
+        } catch (UserNotFoundException | TokenNotFoundException | InvalidOtpException e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
     }
 
     @PostMapping("/change-password")
@@ -99,65 +137,13 @@ public class AuthenticationController {
         return new ResponseData<>(HttpStatus.OK.value(), "Success", "ok");
     }
 
-//    @PostMapping("/otp")
-//    public ResponseData<?> sendOTP(@RequestParam String email,
-//                                   HttpSession session,
-//                                   Model model) {
-//        try {
-//            String OTP = OTPGenerator.generateOTP();
-//            emailService.sendEmail(email, EMessage.TITLE_OTP.getValue(), EMessage.TEXT_EMAIL_OTP.getValue() + OTP);
-//            session.setAttribute("OTP", OTP);
-//            session.setAttribute("OTP_EMAIL", email);
-//            return new ResponseData<>(HttpStatus.OK.value(), "Success");
-//        } catch (UserNotFoundException e) {
-//            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), EMessage.CUSTOMER_NOT_EXIST.getValue());
-//        }
-//    }
-//
-//
-//    @PostMapping("/verify-otp")
-//    public ResponseData<?> verifyOTP(@RequestParam String otp,
-//                                     HttpSession session) {
-//        try {
-//            // Lấy OTP từ session
-//            String sessionOtp = (String) session.getAttribute("OTP");
-//            String sessionEmail = (String) session.getAttribute("OTP_EMAIL");
-//
-//            if (sessionOtp == null || sessionEmail == null) {
-//                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "OTP session has expired or is invalid");
-//            }
-//
-//            if (sessionOtp.equals(otp)) {
-//                session.removeAttribute("OTP");
-//                session.removeAttribute("OTP_EMAIL");
-//                return new ResponseData<>(HttpStatus.OK.value(), "Success");
-//            } else {
-//                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Invalid OTP");
-//            }
-//
-//        } catch (Exception e) {
-//            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while verifying OTP");
-//        }
-//    }
-//
-//    @PostMapping("/changePassword")
-//    public ResponseData<?> changePassword(@RequestParam String email,
-//                                          @RequestParam String newPassword) {
-//        try {
-//            boolean isChanged = userService.changePassword(email, newPassword);
-//
-//            if (isChanged) {
-//                return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully");
-//            } else {
-//                return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "User not found");
-//            }
-//        } catch (Exception e) {
-//            return new ResponseData<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while changing the password");
-//        }
-//    }
 
+<<<<<<< HEAD
     @GetMapping("/getProfile")
     public ResponseData<?> getProfile(@PathVariable("id") String id){
         return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully",userRepository.findById(Long.valueOf(id)));
     }
 }
+=======
+}
+>>>>>>> week3-ddnc

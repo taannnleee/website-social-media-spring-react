@@ -1,6 +1,8 @@
 package org.example.socialmedia.common.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 
@@ -16,4 +18,8 @@ public class Address extends AbstractEntity<Long> {
     private String street;
     private String city;
     private String state;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

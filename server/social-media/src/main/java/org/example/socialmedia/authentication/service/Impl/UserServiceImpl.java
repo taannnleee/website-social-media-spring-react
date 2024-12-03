@@ -2,12 +2,16 @@ package org.example.socialmedia.authentication.service.Impl;
 import lombok.RequiredArgsConstructor;
 import org.example.socialmedia.authentication.dto.request.LoginRequest;
 import org.example.socialmedia.authentication.dto.request.RegistrationRequest;
+import org.example.socialmedia.authentication.dto.request.UpdateProfileRequest;
+import org.example.socialmedia.authentication.dto.response.ProfileResponse;
 import org.example.socialmedia.authentication.dto.response.ResponseData;
 import org.example.socialmedia.authentication.dto.response.TokenRespone;
 import org.example.socialmedia.authentication.exception.InvalidPasswordException;
 import org.example.socialmedia.authentication.exception.UserNotFoundException;
 import org.example.socialmedia.authentication.repositories.UserRepository;
+import org.example.socialmedia.authentication.service.AddressService;
 import org.example.socialmedia.authentication.service.UserService;
+import org.example.socialmedia.common.entities.Address;
 import org.example.socialmedia.common.entities.User;
 import org.example.socialmedia.common.mapper.Mappers;
 import org.slf4j.Logger;
@@ -24,6 +28,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,10 +41,17 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     @Lazy
+    private AuthencationService authencationService;
+
+    @Autowired
+    @Lazy
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AddressService addressService;
 
     @Override
     public List<User> getAllUser() {
@@ -53,13 +66,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseData<?> registerUser(RegistrationRequest registrationRequest) {
+    public RegistrationRequest registerUser(RegistrationRequest registrationRequest) {
+        ArrayList arrayList = new ArrayList();
+        Address address = new Address();
+        arrayList.add(address);
+
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
         User user = Mappers.convertToEntity(registrationRequest, User.class);
         user.setPassword(encodedPassword);
-        userRepository.save(user);
+        user.setStatus(false);
 
-        return new ResponseData<>(HttpStatus.CREATED.value(), "Success", registrationRequest);
+        address.setUser(user);
+        user.setAddresses(arrayList);
+        userRepository.save(user);
+        authencationService.forgotPassword(registrationRequest.getEmail());
+
+        RegistrationRequest registrationRequest1 = Mappers.convertToDto(user, RegistrationRequest.class);
+        return registrationRequest1;
     }
 
     @Override
@@ -72,6 +95,52 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return user.getId();
     }
+
+    @Override
+    public ProfileResponse getProfile(String id) {
+        Optional<User>  userOptional =  userRepository.findById(Long.valueOf(id));
+        if(userOptional.isEmpty()){
+            throw new UserNotFoundException("User not found");
+        }
+        User user = userOptional.get();
+        Address address =  addressService.findAddressByUser(user);
+        if(address == null){
+            throw new UserNotFoundException("Address not found");
+        }
+
+        ProfileResponse profileResponse = Mappers.convertToDto(user, ProfileResponse.class);
+        profileResponse.setCity(address.getCity());
+        profileResponse.setStreet(address.getStreet());
+        profileResponse.setState(address.getState());
+        return profileResponse;
+    }
+
+    @Override
+    public void updateProfile(UpdateProfileRequest updateProfileRequest, String id) {
+        Optional<User> userOptional = userRepository.findById(Long.valueOf(id));
+
+        if(userOptional.isEmpty()){
+            throw new UserNotFoundException("User not found");
+        }
+
+        User user = userOptional.get();
+
+        // Cập nhật thông tin người dùng từ request
+        user.setFullname(updateProfileRequest.getFullname());
+        user.setUsername(updateProfileRequest.getUsername());
+        user.setEmail(updateProfileRequest.getEmail());
+        user.setPhone(updateProfileRequest.getPhone());
+
+        // Cập nhật địa chỉ
+        Address address = addressService.findAddressByUser(user);
+        address.setCity(updateProfileRequest.getCity());
+        address.setStreet(updateProfileRequest.getStreet());
+        address.setState(updateProfileRequest.getState());
+
+        // Lưu lại thông tin đã được cập nhật
+        userRepository.save(user);
+    }
+
 
     @Override
     public Optional<User> findByPhone(String phoneNumber) {
@@ -94,6 +163,8 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUserByPhone = findByPhone(registrationRequest.getPhone());
 
+        Optional<User>optionalUserByEmail = findByEmail(registrationRequest.getEmail());
+
         if (optionalUserByUsername.isPresent()) {
             return optionalUserByUsername.get();
         }
@@ -102,7 +173,11 @@ public class UserServiceImpl implements UserService {
             return optionalUserByPhone.get();
         }
 
-        throw new UserNotFoundException("Username and phone number not found.");
+        if (optionalUserByEmail.isPresent()) {
+            return optionalUserByEmail.get();
+        }
+
+        throw new UserNotFoundException("Username, phone or email number not found.");
     }
 
 

@@ -20,7 +20,6 @@ import java.util.List;
 @Getter
 @Setter
 
-
 public class User extends AbstractEntity<Long> implements UserDetails, Serializable {
     private String username;
     private String fullname;
@@ -29,11 +28,16 @@ public class User extends AbstractEntity<Long> implements UserDetails, Serializa
     private String password;
     private Date dateOfBirth;
     private String gender;
+    private boolean status;
+
     @OneToMany(mappedBy = "user")
     private List<GroupHasUser> groupHasUsers;
 
     @OneToMany(mappedBy = "user")
     private List<UserHasRole> userHasRoles;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Address> addresses ;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
