@@ -43,6 +43,7 @@ public class TestController {
     public ResponseEntity<?> TESTupdate(@PathVariable int id, @RequestParam(required = false) boolean status){
         try{
             System.out.println("hihi");
+            System.out.println("hihi1");
             return ResponseEntity.status(HttpStatus.OK).body("Update Success");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update Error");
