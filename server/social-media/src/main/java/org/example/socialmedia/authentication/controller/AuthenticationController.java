@@ -94,7 +94,10 @@ public class AuthenticationController {
     public ResponseData<?> changePassword(@RequestBody ResetPasswordDTO request) {
         return new ResponseData<>(HttpStatus.OK.value(), "Success", authencationService.changePassword(request));
     }
-
+    @GetMapping("/test")
+    public ResponseData<?> test() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Success", "ok");
+    }
 
 //    @PostMapping("/otp")
 //    public ResponseData<?> sendOTP(@RequestParam String email,
