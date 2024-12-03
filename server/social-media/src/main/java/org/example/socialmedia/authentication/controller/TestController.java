@@ -51,6 +51,7 @@ public class TestController {
 
     @DeleteMapping("test/{id}")
     public ResponseSuccess TESTdelete(@PathVariable int id){
+        System.out.println("test2");
         return new ResponseSuccess(HttpStatus.CREATED, "Success", 1);
     }
 
