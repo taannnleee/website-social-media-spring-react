@@ -55,6 +55,7 @@ public class TestController {
         System.out.println("test2");
         System.out.println("test2");
         System.out.println("test3");
+        System.out.println("test3");
         return new ResponseSuccess(HttpStatus.CREATED, "Success", 1);
     }
 
