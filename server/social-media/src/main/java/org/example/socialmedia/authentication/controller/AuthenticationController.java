@@ -138,12 +138,9 @@ public class AuthenticationController {
     }
 
 
-<<<<<<< HEAD
     @GetMapping("/getProfile")
     public ResponseData<?> getProfile(@PathVariable("id") String id){
         return new ResponseData<>(HttpStatus.OK.value(), "Password changed successfully",userRepository.findById(Long.valueOf(id)));
     }
+
 }
-=======
-}
->>>>>>> week3-ddnc
