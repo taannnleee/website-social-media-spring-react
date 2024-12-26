@@ -134,6 +134,10 @@ public class AuthenticationController {
     }
     @GetMapping("/test")
     public ResponseData<?> test() {
+
+
+        System.out.println("hihi");
+        System.out.println("hihi");
         System.out.println("tan");
         System.out.println("hihi");
         return new ResponseData<>(HttpStatus.OK.value(), "Success", "ok");
