@@ -35,6 +35,7 @@ public class HomeController {
         try{
             System.out.println("hihi");
             System.out.println("hiih6i");
+            System.out.println("hihihi");
             List<Product> productList =  productService.getAllProduct();
 
             return new ResponseData<>(HttpStatus.OK.value(), "get all product successfully",productList);
