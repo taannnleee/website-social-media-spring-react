@@ -11,6 +11,7 @@
     <groupId>org.example</groupId>
     <artifactId>social-media</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>social-media</name>
     <description>social-media</description>
     <properties>

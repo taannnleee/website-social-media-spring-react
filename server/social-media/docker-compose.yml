@@ -1,60 +1,37 @@
+version: '3.8'
 
-version: '3'
 services:
-  social-media-volume-db:
-    container_name: social-media-db
-    image: mysql:latest
+  # MySQL service
+  mysql:
+    image: mysql/mysql-server:latest
+    container_name: mysql-container
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE= SocialMedia
-      - MYSQL_ROOT_HOST=%
+      MYSQL_ROOT_PASSWORD: my-secret-pw  # Đặt mật khẩu cho user root
+      MYSQL_DATABASE: my_database        # Tạo một cơ sở dữ liệu mặc định
+      MYSQL_USER: user                   # Tạo user mới (tùy chọn)
+      MYSQL_PASSWORD: user_password      # Mật khẩu của user mới (tùy chọn)
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Mở cổng MySQL ra ngoài để kết nối từ máy chủ
     volumes:
-      - social-media-volume-db:/var/lib/mysql
+      - mysql-data:/var/lib/mysql  # Dung lượng dữ liệu sẽ được lưu trữ ngoài container
+    restart: always  # Đảm bảo container luôn chạy lại nếu nó dừng
+
+  # Spring Boot Backend (BE) service
+  backend:
+    build:
+      context:  ../social-media # Đảm bảo rằng đường dẫn này đúng với vị trí của Dockerfile
+    container_name: spring-boot-backend
+    ports:
+      - "8080:8080"  # Mở cổng 8080 cho ứng dụng Spring Boot
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/my_database  # Kết nối tới MySQL
+      SPRING_DATASOURCE_USERNAME: user  # Tên người dùng MySQL
+      SPRING_DATASOURCE_PASSWORD: user_password  # Mật khẩu người dùng MySQL
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update  # Đảm bảo Hibernate tự động cập nhật schema nếu cần
+    depends_on:
+      - mysql  # Đảm bảo MySQL khởi động trước backend
+    restart: always  # Đảm bảo backend luôn chạy lại nếu nó dừng
 
 volumes:
-  social-media-volume-db:
-
-#version: '3.9'
-#
-#services:
-#  api-service-test:
-#    container_name: social-media
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
-#    ports:
-#      - '8080:8080'
-#    networks:
-#      - backend
-#    depends_on:
-#      - mysql-db
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/SocialMedia
-#      SPRING_DATASOURCE_USERNAME: root
-#      SPRING_DATASOURCE_PASSWORD: root
-#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-#      SPRING_JPA_SHOW_SQL: true
-#      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
-#      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
-#
-#  mysql-db:
-#    build:
-#      context: ./mysql
-#      dockerfile: Dockerfile
-#    container_name: social-media-db
-#    ports:
-#      - "3307:3306"
-#    volumes:
-#      - code-solution-data:/var/lib/mysql
-#    networks:
-#      - backend
-#
-#networks:
-#  backend:
-#    driver: bridge
-#
-#volumes:
-#  code-solution-data:
-
+  mysql-data:
+    driver: local  # Đảm bảo dữ liệu sẽ được lưu trữ trên đĩa của máy chủ
