@@ -33,6 +33,7 @@ public class HomeController {
     @GetMapping("/getAllProduct")
     public ResponseData<?> getAllProduct(){
         try{
+            System.out.println("hihi");
             List<Product> productList =  productService.getAllProduct();
 
             return new ResponseData<>(HttpStatus.OK.value(), "get all product successfully",productList);
